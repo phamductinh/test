@@ -67,14 +67,14 @@
 				width: 100%;
 				height: 50px;
 				border-radius: 15px;
-				background: transparent;
+				background: #354855;
 				border: none;
 				outline: none;
 				display: flex;
 				font-size: 15px;
 				font-weight: 600;
 				gap: 15px;
-				color: #0a1317;
+				color: #fff;
 				align-items: center;
 				cursor: pointer;
 				padding-left: 20px;
@@ -85,7 +85,7 @@
 				}
 
 				&:hover {
-					background: #dcdddd;
+					background: #b7b8b8;
 				}
 			}
 		}
